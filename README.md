@@ -65,7 +65,7 @@ attachment.create(file, (err, url) {
 ### Remove
 
 ```javascript
-attachment.remove(url, (err, url) {
+attachment.remove("/system/548831d1e61bb2464310e803.png", (err, url) {
     console.log(url);
 });
 ```
