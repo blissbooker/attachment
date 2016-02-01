@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test --recursive",
-    "validate": "jscs . --config=./.jscsrc --reporter=inline"
+    "validate": "jscs . --config=./.jscsrc --reporter=inline",
+    "lint": "jshint ."
   },
   "repository": {
     "type": "git",
@@ -29,14 +30,19 @@
     "node": ">= 4.2.1"
   },
   "devDependencies": {
-    "async": "^0.9.0",
+    "async": "^1.5.2",
     "chai": "^1.10.0",
-    "jscs": "^1.8.1",
-    "jshint": "^2.5.11",
-    "lodash": "^2.4.1",
-    "mocha": "^1.20.1",
-    "precommit-hook": "^1.0.7",
-    "sinon": "^1.12.2",
-    "sinon-chai": "^2.6.0"
-  }
+    "jscs": "^2.9.0",
+    "jshint": "^2.9.1",
+    "lodash": "^2.4.2",
+    "mocha": "^2.4.5",
+    "precommit-hook": "^3.0.0",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
+  },
+  "pre-commit": [
+    "lint",
+    "validate",
+    "test"
+  ]
 }
