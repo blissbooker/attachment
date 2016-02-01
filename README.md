@@ -1,4 +1,4 @@
-# mongoose-attachment
+# attachment
 
 [![Build Status](https://travis-ci.org/blissbooker/attachment.svg?branch=master)](https://travis-ci.org/blissbooker/attachment)
 [![Dependency Status](https://gemnasium.com/blissbooker/attachment.svg)](https://gemnasium.com/blissbooker/attachment)
