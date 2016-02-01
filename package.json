@@ -1,7 +1,7 @@
 {
-  "name": "Attachment",
+  "name": "attachment",
   "version": "1.0.0",
-  "description": "Simple abstraction to upload attachments to filesystem or cloudinary",
+  "description": "Simple abstraction attachment abstraction utilizing filesystem or cloudinary.",
   "private": true,
   "main": "index.js",
   "scripts": {
