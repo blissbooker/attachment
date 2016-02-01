@@ -14,7 +14,7 @@ It handles attachment creation and deletion using one of the following storage s
 ### Filesystem Storage
 
 ```javascript
-const config = {
+const options = {
     strategy: 'filesystem',
     attribute: 'image',
     config: {
@@ -27,7 +27,7 @@ const config = {
 ### Cloudinary Storage
 
 ```javascript
-const config = {
+const options = {
     strategy: 'cloudinary',
     config: {
         cloud_name: 'test',
@@ -39,7 +39,7 @@ const config = {
 ```
 
 ```javascript
-const attachment = require('attachment')(config);
+const attachment = require('attachment')(options);
 ```
 
 ## Usage
