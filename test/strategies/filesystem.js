@@ -1,128 +1,105 @@
 'use strict';
 
-/*global describe, it, before, beforeEach, after */
+/*global describe, it, beforeEach, after */
 
-var expect = require('chai').expect;
-var Model = require('../fixtures/filesystem');
-var fs = require('fs');
-var async = require('async');
-var rimraf = require('rimraf');
-var mongoose = require('mongoose');
-var path = require('path');
+const expect = require('chai').expect;
+const fs = require('fs');
+const async = require('async');
+const rimraf = require('rimraf');
+const path = require('path');
 
-describe('Filesystem Strategy', function () {
+describe('filesystem strategy', () => {
 
-    var mammoth;
+    const fixtures = path.join(__dirname, '..', 'fixtures');
+    const images = path.join(fixtures, 'images');
+    const tmp = path.join(fixtures, '.tmp');
 
-    var fixtures = path.join(__dirname, '..', 'fixtures');
-    var images = path.join(fixtures, 'images');
+    const mammothFixture = fs.realpathSync(images + '/mammoth.jpg');
+    const mammothSource = mammothFixture + '-tmp.jpg';
 
-    var tmp = path.join(fixtures, '.tmp');
-    var resources = path.join(tmp, 'resources');
+    const spongebobFixture = fs.realpathSync(images + '/spongebob.png');
+    const spongebobSource = spongebobFixture + '-tmp.png';
 
-    var mammothFixture = fs.realpathSync(images + '/mammoth.jpg');
-    var mammothSource = mammothFixture + '-tmp.jpg';
+    const mammoth = {
+        path: mammothSource,
+        contentType: 'image/jpeg'
+    };
 
-    var spongebobFixture = fs.realpathSync(images + '/spongebob.png');
-    var spongebobSource = spongebobFixture + '-tmp.png';
+    const spongebob = {
+        path: spongebobSource,
+        contentType: 'image/png'
+    };
 
-
-    function resourcePath(model, ext) {
-        return resources + '/' + model.id + '.' + ext;
-    }
-
-    function createMammoth() {
-        return new Model({
-            image: {
-                filename: 'mammoth.jpg',
-                fileSize: 232030,
-                contentType: 'image/jpeg',
-            }
-        });
-    }
-
-    function createSpongebob() {
-        return new Model({
-            image: {
-                filename: 'spongebob.png',
-                fileSize: 114801,
-                contentType: 'image/png',
-            }
-        });
-    }
-
-    before(function () {
-        mongoose.connect('mongodb://localhost/mockgoose_attachment_test');
-        mammoth = createMammoth();
+    const attachment = require('../..')({
+        strategy: 'filesystem',
+        config: {
+            path: tmp,
+            url: ''
+        }
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
         fs.createReadStream(mammothFixture).pipe(fs.createWriteStream(mammothSource));
     });
 
-    after(function (done) {
-        mongoose.connection.db.dropDatabase();
-        mongoose.connection.close();
+    after((done) => {
         rimraf(tmp, done);
     });
 
-    it('moves the image to target path', function (done) {
-        mammoth.attach(mammothSource, function () {
-            expect(fs.existsSync(resourcePath(mammoth, 'jpeg'))).to.be.true;
+    it('moves the image to target path', (done) => {
+        attachment.create(mammoth, (err, url) => {
+            expect(fs.existsSync(tmp + url)).to.be.true;
             done();
         });
     });
 
-    it('assigns the url', function (done) {
-        mammoth.attach(mammothSource, function () {
-            expect(mammoth.toJSON().image.url).to.equal('/system/resources/' + mammoth.id + '.jpeg');
-            done();
-        });
-    });
+    describe('remove', () => {
 
-    describe('detach', function () {
-
-        it('deletes the assigned image', function (done) {
-            async.series([
-                function (callback) {
-                    mammoth.attach(mammothSource, function () {
-                        expect(fs.existsSync(resourcePath(mammoth, 'jpeg'))).to.be.true;
-                        mammoth.save(callback);
+        it('deletes the assigned image', (done) => {
+            async.waterfall([
+                (callback) => {
+                    attachment.create(mammoth, (err, url) => {
+                        expect(fs.existsSync(tmp + url)).to.be.true;
+                        callback(err, url);
                     });
                 },
-                function (callback) {
-                    mammoth.remove(function (err) {
-                        expect(fs.existsSync(resourcePath(mammoth, 'jpeg'))).to.be.false;
+                (url, callback) => {
+                    attachment.remove(url, (err) => {
+                        expect(fs.existsSync(tmp + url)).to.be.false;
                         callback(err);
                     });
                 }
             ], done);
         });
 
-        it('leaves existing images untouched', function (done) {
+        it('leaves existing images untouched', (done) => {
 
-            var spongebob = createSpongebob();
+            async.series({
 
-            async.series([
-                function (callback) {
-                    mammoth.attach(mammothSource, function () {
-                        mammoth.save(callback);
-                    });
-                },
-                function (callback) {
+                spongebob: (callback) => {
                     fs.createReadStream(spongebobFixture).pipe(fs.createWriteStream(spongebobSource));
-                    spongebob.attach(spongebobSource, function () {
-                        expect(fs.existsSync(resourcePath(mammoth, 'jpeg'))).to.be.true;
-                        spongebob.save(callback);
+                    attachment.create(spongebob, (err, url) => {
+                        expect(fs.existsSync(tmp + url)).to.be.true;
+                        callback(err, url);
                     });
                 },
-                function (callback) {
-                    mammoth.remove(function (err) {
-                        expect(fs.existsSync(resourcePath(spongebob, 'png'))).to.be.true;
-                        callback(err);
+
+                mammoth: (callback) => {
+                    attachment.create(mammoth, (err, url) => {
+                        expect(fs.existsSync(tmp + url)).to.be.true;
+                        callback(err, url);
                     });
                 }
-            ], done);
+
+            }, (err, results) => {
+
+                attachment.remove(results.mammoth, (err) => {
+                    expect(fs.existsSync(tmp + results.mammoth)).to.be.false;
+                    expect(fs.existsSync(tmp + results.spongebob)).to.be.true;
+                    done(err);
+                });
+
+            });
         });
     });
 

@@ -1,7 +1,7 @@
 {
-  "name": "mongoose-attachment",
+  "name": "Attachment",
   "version": "1.0.0",
-  "description": "Mongoose attachment extension",
+  "description": "Simple abstraction to upload attachments to filesystem or cloudinary",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -10,27 +10,23 @@
   },
   "repository": {
     "type": "git",
-    "url": " git@source.enterat.de:reservation-engine/mongoose-attachment.git"
+    "url": " git@github.com:blissbooker/attachment.git"
   },
   "keywords": [
     "mongoose"
   ],
   "author": "Steffen Leistner <sleistner@gmail.com>",
-  "contributors": [
-    "Sascha Teske <sascha.teske@gmail.com>",
-    "Rui Quelhas <rui@alpha-iv.com>",
-    "Filipe Pinheiro <filipe@alpha-iv.com>"
-  ],
   "license": "ISC",
   "dependencies": {
-    "cloudinary": "^1.1.0",
-    "mime-types": "^2.0.4",
-    "mongoose": "^3.8.12",
-    "mv": "^2.0.1",
-    "rimraf": "^2.2.8"
+    "cloudinary": "^1.3.0",
+    "lodash": "^4.1.0",
+    "mime-types": "^2.1.9",
+    "mv": "^2.1.1",
+    "node-uuid": "^1.4.7",
+    "rimraf": "^2.5.1"
   },
   "engines": {
-    "node": "*"
+    "node": ">= 4.2.1"
   },
   "devDependencies": {
     "async": "^0.9.0",
