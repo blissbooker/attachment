@@ -1,4 +1,9 @@
-# attachment
+# What's attachment?
+
+Attachments is a generic attachments plugin for node. 
+It handles attachment creation and deletion using one of the following storage strategies:
+- Cloudinary
+- Filesystem
 
 [![Build Status](https://travis-ci.org/blissbooker/attachment.svg?branch=master)](https://travis-ci.org/blissbooker/attachment)
 [![Dependency Status](https://gemnasium.com/blissbooker/attachment.svg)](https://gemnasium.com/blissbooker/attachment)
@@ -10,34 +15,57 @@
 
 ```javascript
 const config = {
-    {
-        strategy: 'filesystem',
-        attribute: 'image',
-        config: {
-            path: '/tmp/system',
-            url: '/system'
-        }
+    strategy: 'filesystem',
+    attribute: 'image',
+    config: {
+        path: '/tmp/system',
+        url: '/system'
     }
 };
+```
 
+### Cloudinary Storage
+
+```javascript
+const config = {
+    strategy: 'cloudinary',
+    config: {
+        cloud_name: 'test',
+        api_key: '123',
+        api_secret: '123',
+        secure: true
+    }
+};
+```
+
+```javascript
 const attachment = require('attachment')(config);
 ```
 
 ## Usage
 
+
+### Create
+
 ```javascript
-const params = {
-  file: {
-  	  path: 'path/to/foobar.png'
-      contentType: 'image/png'
-  }
+const file = {
+    path: 'path/to/foobar.png'
+    contentType: 'image/png'
 };
 
-attachment.create(params, (err, url) {
+attachment.create(file, (err, url) {
     console.log(url);
 });
 ```
 
 ```javascript
 "/system/548831d1e61bb2464310e803.png"
+```
+
+### Remove
+
+```javascript
+attachment.remove(url, (err, url) {
+    console.log(url);
+});
 ```
